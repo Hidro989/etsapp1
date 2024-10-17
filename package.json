@@ -1,0 +1,33 @@
+{
+  "name": "etsapp1",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --mode development",
+    "start": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@shopify/app-bridge": "^3.7.10",
+    "@shopify/app-bridge-react": "^4.1.5",
+    "@shopify/polaris": "^13.9.0",
+    "@shopify/shopify-api": "^11.5.0",
+    "@shopify/shopify-app-session-storage": "^3.0.7",
+    "@vitejs/plugin-react": "^4.3.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "mongoose": "^8.7.1",
+    "nodemon": "^3.1.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.9",
+    "vite-plugin-html": "^3.2.2"
+  }
+}

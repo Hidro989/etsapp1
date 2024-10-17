@@ -1,0 +1,1 @@
+export const isValidShop = (shop) => /^[a-zA-Z0-9-]+\.myshopify\.com$/.test(shop);
