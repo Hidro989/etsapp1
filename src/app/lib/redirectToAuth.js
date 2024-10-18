@@ -31,7 +31,7 @@ function clientSideRedirect(req, res, shopify, shop) {
 
 async function serverSideRedirect(req, res, shopify, shop, isOnline) {
     await shopify.auth.begin({
-        callbackPath: '/etsapp1/api/auth/callback',
+        callbackPath: process.env.SHOPIFY_API_REDIRECT_URI,
         shop,
         isOnline,
         rawRequest: req,

@@ -1,8 +1,7 @@
-import shopify from "../../configs/shopify.js";
 import {HttpResponseError} from "@shopify/shopify-api";
 
 export class WebhookService {
-    static register = async (session, topic) => {
+    static register = async (shopify, session, topic) => {
         try {
             const webhook = new shopify.rest.Webhook({ session: session });
             webhook.address = `${process.env.APP_URL}/merchant/webhook`;

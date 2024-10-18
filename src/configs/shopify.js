@@ -18,5 +18,8 @@ const shopify = shopifyApi({
         customerAddressDefaultFix: true,
         unstable_managedPricingSupport: true,
     },
+    webhooks: {
+        path: "/etsapp1/api/webhooks",
+    },
 });
 export default shopify;

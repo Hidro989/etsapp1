@@ -32207,7 +32207,7 @@ const Login = () => {
     setErrorText(errorText2);
     if (!errorText2) {
       setIsLoading(true);
-      window.location.href = `${"https://hydrodev.deskbox.org"}/login/api/auth?shop=${removeProtocol(shopDomain)}`;
+      window.location.href = `${"https://huydev.deskbox.org"}/etsapp1/api/auth?shop=${removeProtocol(shopDomain)}`;
       setTimeout(() => {
         setIsLoading(false);
       }, 6e3);
@@ -32215,7 +32215,7 @@ const Login = () => {
   }, [shopDomain]);
   return /* @__PURE__ */ jsxRuntimeExports.jsx(Page, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(BlockStack, { inlineAlign: "center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { width: "500px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Box, { paddingInline: 300, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("img", { width: "100px", height: "100px", src: `${"https://hydrodev.deskbox.org"}/public/images/contact_logo.png`, alt: "Contact form ultimate" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("img", { width: "100px", height: "100px", src: `${"https://huydev.deskbox.org"}/public/images/contact_logo.png`, alt: "Contact form ultimate" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "h2", variant: "headingXl", children: "Log in" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Text, { as: "p", children: "Continute to UpForm  - Contact Form Builder" })
     ] }),
@@ -32240,4 +32240,4 @@ const App = () => {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(AppProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Login, {}) });
 };
 ReactDOM.render(/* @__PURE__ */ jsxRuntimeExports.jsx(App, {}), document.getElementById("root"));
-//# sourceMappingURL=main-5dTyJwhm.js.map
+//# sourceMappingURL=main-5CRtRQyq.js.map
