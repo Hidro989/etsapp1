@@ -16,7 +16,7 @@ import { EnsureBillingService } from "../services/EnsureBillingService.js";
 
 export async function authCallback(req, res, shopify) {
   try {
-    await Database.connect();
+    // await Database.connect();
     const callbackResponse = await shopify.auth.callback({
       rawRequest: req,
       rawResponse: res,

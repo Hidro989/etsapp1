@@ -1,11 +1,17 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import '@shopify/polaris/build/esm/styles.css';
 import { Box, Page, Text, TextField, Card, BlockStack, Button } from "@shopify/polaris";
+import {contact_logo} from '../public/index.js'
 
 export const Login = () => {
     const [shopDomain, setShopDomain] = useState('');
     const [errorText, setErrorText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        console.log(window.location);
+        
+    }, []);
 
     const isValidShopDomain = (value) => {
         const regex = /^(https?:\/\/)?([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,5}(\/.*)?$/i;
@@ -49,7 +55,7 @@ export const Login = () => {
         setErrorText(errorText);
         if (!errorText) {
             setIsLoading(true);
-            window.location.href = `${VITE_APP_DOMAIN}/etsapp1/api/auth?shop=${removeProtocol(shopDomain)}`;
+            window.location.href = `${import.meta.env.VITE_APP_URL}/etsapp1/api/auth?shop=${removeProtocol(shopDomain)}`;
             setTimeout(() => {
                 setIsLoading(false);
             }, 6000);
@@ -62,7 +68,7 @@ export const Login = () => {
                 <div style={{ width: "500px" }}>
                     <Card>
                         <Box paddingInline={300}>
-                            <img width="100px" height="100px" src={`${VITE_APP_DOMAIN}/public/images/contact_logo.png`} alt="Contact form ultimate" />
+                            <img width="100px" height="100px" src={contact_logo} alt="Contact form ultimate" />
                             <Text as="h2" variant="headingXl">Log in</Text>
                             <Text as="p" >Continute to UpForm  - Contact Form Builder</Text>
                         </Box>
