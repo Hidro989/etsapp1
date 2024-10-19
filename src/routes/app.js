@@ -19,7 +19,7 @@ app.get("/products", async (_req, res) => {
     const urlObj = new URL(tmpReferer);
     const shop = urlObj.searchParams.get("shop");
     let dbSession = await Session.findOne({ shop: shop });
-    
+
     if (dbSession) {
       dbSession = new SessionShopify({
         id: dbSession.session_id,
@@ -32,53 +32,74 @@ app.get("/products", async (_req, res) => {
         onlineAccessInfo: dbSession.online_access_info,
       });
 
-      const client = new shopify.clients.Graphql({session: dbSession});
+      let cursor = _req.query.cursor || null;
+      let mode = _req.query.mode || 'next';
+      
+      let generalQuery = `edges {
+                      node {
+                        id
+                        title
+                        onlineStorePreviewUrl
+                        status
+                        totalInventory
+                        images(first: 1) {
+                          edges {
+                            node {
+                              url
+                              altText
+                            }
+                          }
+                        }
+                        collections(first: 5) {
+                          edges {
+                            node {
+                              id
+                              title
+                            }
+                          }
+                        } 
+                        productType
+                        vendor
+                      }
+                    }`;
 
-        const response = await client.query({
-        data: `query {
-            products(first: 10) {
-            edges {
-                node {
-                id
-                title
-                handle
+      let query = '';
+      if (mode === 'next') {
+          query = `query{
+                      products(first: 50, ${ cursor ? (',after:"'+ cursor +'"'): ''}) {
+                              ${generalQuery}
+                              pageInfo {
+                                hasNextPage
+                                endCursor
+                                hasPreviousPage
+                                startCursor
+                              }
+                            }
+                  }`
+      }else {
+        query = `query{
+          products(last: 50, ${ cursor ? (',before:"'+ cursor +'"'): ''}) {
+                  ${generalQuery}
+                  pageInfo {
+                    hasPreviousPage
+                    startCursor
+                    hasNextPage
+                    endCursor
+                  }
                 }
-                cursor
-            }
-            pageInfo {
-                hasNextPage
-            }
-            }
-        }`,
-        });
+      }`
+      }             
+      
+      const client = new shopify.clients.Graphql({ session: dbSession });
+      
+      const response = await client.request( query );
 
-        console.log(response.body.data);
-        
-
-
-    //   const response = await client.request(`
-    //             query shopifyProducts {
-    //               products(first: 10) {
-    //                 edges{
-    //                   node {
-    //                     id
-    //                     title
-    //                     handle
-    //                   }
-    //                   cursor  
-    //                 }
-    //                 pageInfo {
-    //                 hasNextPage
-    //                 }
-    //               }
-    //             }
-    //           `);
 
       res.status(200).send({ products: response.data.products });
     }
+  } else {
+    res.status(200).send({ sucesss: "error", message: "Not Found Session" });
   }
-
-  res.status(200).send({ sucesss: "error", message: "Not Found Session" });
 });
 
 export default app;
