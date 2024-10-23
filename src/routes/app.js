@@ -4,19 +4,23 @@ import shopify from "../configs/shopify.js";
 import Session from "../app/models/Session.js";
 import { Session as SessionShopify } from "@shopify/shopify-api";
 import { Database } from "../configs/database.js";
+import { validateAuthenticatedSession } from "../app/lib/validateAuthenticatedSession.js";
+import { cspHeaders } from "../app/lib/cspHeader.js";
+import AuthController from "../app/controllers/AuthController.js";
+import cors from "cors";
+import bodyParser from "body-parser";
+
 const app = express();
 
 await Database.connect();
 
-app.use("/", authRoute);
+app.use("/shopify", authRoute);
 
-app.get("/products", async (_req, res) => {
-  let tmpReferer =
-    "https://huydev.deskbox.org/etsapp1/dev/?embedded=1&hmac=e1f6e8e81a4f5e448583a666def410c621bc289ab03286aebffe996000ce111e&host=YWRtaW4uc2hvcGlmeS5jb20vc3RvcmUvaHlkcm9zaG9wOTk4&id_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczpcL1wvaHlkcm9zaG9wOTk4Lm15c2hvcGlmeS5jb21cL2FkbWluIiwiZGVzdCI6Imh0dHBzOlwvXC9oeWRyb3Nob3A5OTgubXlzaG9waWZ5LmNvbSIsImF1ZCI6IjhhMTIwNjg3NDA4Mjg0OWMyNDQzYjkzODAwODdiOGM1Iiwic3ViIjoiMTA4MDYzNTg4NjYwIiwiZXhwIjoxNzI5MjQzNTQ2LCJuYmYiOjE3MjkyNDM0ODYsImlhdCI6MTcyOTI0MzQ4NiwianRpIjoiM2JlMmI5OTYtMDMyZS00NGRkLWIwNjQtNmFiY2NhNjIyMTJiIiwic2lkIjoiNmZkY2Q4YzAtZGYwMi00ODU1LWEwZDYtNDAyNDc1ZDIyYWMzIiwic2lnIjoiYTdiMTcxYjE3ZjU1YjZhYzc1NDdhZDQxMGQxNDNlMDUwZGRhZjIzOTRmNzE2MzFiNTRiMDgyOTE4YjlkMTZmMCJ9.LxeHraAXNwPQMCN2RiFQRlblval_3yYVVFaxe9QJfv4&locale=en-US&session=729d18cadd547ba4cdf16a810a806018c377b5da692cea58fd416d9aae142301&shop=hydroshop998.myshopify.com&timestamp=1729243486";
-  if (tmpReferer) {
-    //_req.headers.referer
-    // const urlObj = new URL(_req.headers.referer);
-    const urlObj = new URL(tmpReferer);
+// app.use("/*", validateAuthenticatedSession);
+
+app.get("/shopify/products", async (_req, res) => {
+  if (_req.headers.referer) {
+    const urlObj = new URL(_req.headers.referer);
     const shop = urlObj.searchParams.get("shop");
     let dbSession = await Session.findOne({ shop: shop });
 
@@ -33,8 +37,8 @@ app.get("/products", async (_req, res) => {
       });
 
       let cursor = _req.query.cursor || null;
-      let mode = _req.query.mode || 'next';
-      
+      let mode = _req.query.mode || "next";
+
       let generalQuery = `edges {
                       node {
                         id
@@ -63,10 +67,12 @@ app.get("/products", async (_req, res) => {
                       }
                     }`;
 
-      let query = '';
-      if (mode === 'next') {
-          query = `query{
-                      products(first: 50, ${ cursor ? (',after:"'+ cursor +'"'): ''}) {
+      let query = "";
+      if (mode === "next") {
+        query = `query{
+                      products(first: 50, ${
+                        cursor ? ',after:"' + cursor + '"' : ""
+                      }) {
                               ${generalQuery}
                               pageInfo {
                                 hasNextPage
@@ -75,10 +81,10 @@ app.get("/products", async (_req, res) => {
                                 startCursor
                               }
                             }
-                  }`
-      }else {
+                  }`;
+      } else {
         query = `query{
-          products(last: 50, ${ cursor ? (',before:"'+ cursor +'"'): ''}) {
+          products(last: 50, ${cursor ? ',before:"' + cursor + '"' : ""}) {
                   ${generalQuery}
                   pageInfo {
                     hasPreviousPage
@@ -87,13 +93,12 @@ app.get("/products", async (_req, res) => {
                     endCursor
                   }
                 }
-      }`
-      }             
-      
-      const client = new shopify.clients.Graphql({ session: dbSession });
-      
-      const response = await client.request( query );
+      }`;
+      }
 
+      const client = new shopify.clients.Graphql({ session: dbSession });
+
+      const response = await client.request(query);
 
       res.status(200).send({ products: response.data.products });
     }
@@ -101,5 +106,52 @@ app.get("/products", async (_req, res) => {
     res.status(200).send({ sucesss: "error", message: "Not Found Session" });
   }
 });
+
+const corsOptions = {
+  origin: "https://hydroshop998.myshopify.com",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+app.use(bodyParser.json());
+
+app.get("/getDataRating", async (req, res) => {
+  res.status(200).json({status: 'success', data: {} });
+});
+
+app.post("/saveRating", async (req, res) => {
+  const {
+    productID,
+    rating,
+    msg,
+    productTitle,
+    customerID,
+    customerName,
+    customerEmail,
+  } = req.body;
+
+  if (typeof rating !== 'number') {
+    return res.status(200).json({ status: 'error', error: 'Dữ liệu không hợp lệ' });
+  }
+
+  console.log("Rating:", rating);
+  console.log("Message:", msg);
+  console.log("productID:", productID);
+  console.log("productTitle:", productTitle);
+  console.log("customerID:", customerID);
+  console.log("customerName:", customerName);
+  console.log("customerEmail:", customerEmail);
+
+  res.status(200).json({status: 'success', message: "Rating đã được lưu thành công!" });
+});
+
+// app.use(cspHeaders);
+
+// const authController = new AuthController();
+// app.use("/shopify/*", authController.ensureInstalledOnShop, async (_req, res) => {
+//   const frontendUrl = process.env.APP_URL || "https://huydev.deskbox.org";
+//   res.redirect(frontendUrl);
+// });
 
 export default app;

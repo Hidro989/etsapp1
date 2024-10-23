@@ -5,7 +5,6 @@ import {
   InvalidOAuthError,
 } from "@shopify/shopify-api";
 import { redirectToAuth } from "./redirectToAuth.js";
-import { Database } from "../../configs/database.js";
 import { SessionShopifyApp } from "../lib/SessionShopifyApp.js";
 import { WebhookService } from "../services/WebhookService.js";
 import User from "../models/User.js";
@@ -36,7 +35,7 @@ export async function authCallback(req, res, shopify) {
         'Completing offline token OAuth, redirecting to online token OAuth',
       );
 
-      await redirectToAuth({req, res, shopify, isOnline: true});
+      await redirectToAuth({req, res, isOnline: true});
       return false;
     }
 
@@ -92,7 +91,7 @@ async function handleCallbackError(req, res, shopify, error) {
       res.send(error.message);
       break;
     case error instanceof CookieNotFound:
-      await redirectToAuth({req, res, shopify});
+      await redirectToAuth({req, res});
       break;
     case error instanceof BotActivityDetected:
       res.status(410);

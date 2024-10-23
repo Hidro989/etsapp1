@@ -8,11 +8,6 @@ export const Login = () => {
     const [errorText, setErrorText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
-        console.log(window.location);
-        
-    }, []);
-
     const isValidShopDomain = (value) => {
         const regex = /^(https?:\/\/)?([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,5}(\/.*)?$/i;
         return regex.test(value);
@@ -55,7 +50,7 @@ export const Login = () => {
         setErrorText(errorText);
         if (!errorText) {
             setIsLoading(true);
-            window.location.href = `${import.meta.env.VITE_APP_URL}/etsapp1/api/auth?shop=${removeProtocol(shopDomain)}`;
+            window.location.href = `${import.meta.env.VITE_APP_URL}/etsapp1/api/shopify/auth?shop=${removeProtocol(shopDomain)}`;
             setTimeout(() => {
                 setIsLoading(false);
             }, 6000);

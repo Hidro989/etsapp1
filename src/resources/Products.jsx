@@ -31,7 +31,7 @@ export default function Products() {
       const response = await fetch(
         `${
           import.meta.env.VITE_APP_URL
-        }/etsapp1/api/products?mode=${mode}&cursor=${cursor}`,
+        }/etsapp1/api/shopify/products?mode=${mode}&cursor=${cursor}`,
         { method: "GET" }
       );
       const data = await response.json();

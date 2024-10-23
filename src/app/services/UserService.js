@@ -1,7 +1,4 @@
 import {ApiService} from './ApiService.js';
-// import {ContactFormSettingService} from './ContactFormSettingService.js';
-// import {TranslationService} from './TranslationService.js';
-// import {MessageTagService} from './MessageTagService.js';
 
 export class UserService {
 

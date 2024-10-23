@@ -163,7 +163,7 @@ export class EnsureBillingService {
             is_installed: config.is_installed || false
         }).toString();
 
-        const returnUrl = config.returnUrl || `${process.env.APP_URL}/login/api/plan/callback?${queryParams}`
+        const returnUrl = config.returnUrl || `${process.env.APP_URL}/login/api/shopify/plan/callback?${queryParams}`
 
         let data = null;
         if (this.isRecurring(config)) {

@@ -1,6 +1,7 @@
 import { redirectOutOfApp } from "./redirectOutOfApp.js";
+import shopify from "../../configs/shopify.js";
 
-export async function redirectToAuth(req, res, shopify, isOnline = false) {
+export async function redirectToAuth(req, res, isOnline = false) {
   const shop = shopify.utils.sanitizeShop(req.query.shop);
   if (!shop) {
     res.status(500);
