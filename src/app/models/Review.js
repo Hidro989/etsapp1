@@ -62,8 +62,18 @@ const storeReview = async (review) => {
 
 const getReviewsByProductId = async (productId) => {
   try {
-    const reviews = await Review.find({ productId });
+    const reviews = await Review.find({ productId, ratingStatus: 'approved' });
     return reviews;
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    throw new Error('Could not fetch reviews');
+  }
+};
+
+const getReviewsByCustomerIdAndProductId = async (customerId,productId) => {
+  try {
+    const review = await Review.find({ customerId, productId, ratingStatus: 'pending' });
+    return review;
   } catch (error) {
     console.error('Error fetching reviews:', error);
     throw new Error('Could not fetch reviews');
@@ -84,4 +94,4 @@ const deleteReviewById = async (reviewId) => {
 };
 
 
-export {loadReview, storeReview, getReviewsByProductId, deleteReviewById};
+export {loadReview, storeReview, getReviewsByProductId, deleteReviewById, getReviewsByCustomerIdAndProductId};
