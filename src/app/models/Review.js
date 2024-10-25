@@ -6,6 +6,7 @@ const reviewSchema = new mongoose.Schema({
   customerId: { type: String, required: true },
   email: { type: String, required: true },
   customerName: { type: String },
+  customerEmail: { type: String, required: true },
   rating: { type: Number, required: true },
   message: { type: String },
   ratingStatus: { type: String, enum: ['pending', 'approved'], default: 'pending' },
@@ -14,6 +15,35 @@ const reviewSchema = new mongoose.Schema({
 const Review = mongoose.model('Review', reviewSchema);
 
 export default Review;
+
+const approveReviewById = async (reviewId) => {
+  try {
+    const updatedReview = await Review.findByIdAndUpdate(
+      reviewId,
+      { ratingStatus: 'approved' },
+      { new: true }
+    );
+    
+    if (!updatedReview) {
+      throw new Error('Review not found');
+    }
+    
+    return updatedReview;
+  } catch (error) {
+    console.error('Error approving review:', error);
+    throw new Error('Could not approve review');
+  }
+};
+
+const getAllReviews = async () => {
+  try {
+    const reviews = await Review.find().sort({ createdAt: -1 });
+    return reviews;
+  } catch (error) {
+    console.error('Error fetching all reviews:', error);
+    throw new Error('Could not fetch all reviews');
+  }
+};
 
 const loadReview = async (reviewId) => {
     const dbReview = await Review.findOne({ _id: reviewId });
@@ -24,6 +54,7 @@ const loadReview = async (reviewId) => {
         productTitle: dbReview.productTitle,
         customerId: dbReview.customerId,
         customerName: dbReview.customerName,
+        customerEmail: dbReview.customerEmail,
         rating: dbReview.rating,
         message: dbReview.message,
         ratingStatus: dbReview.ratingStatus,
@@ -34,16 +65,17 @@ const loadReview = async (reviewId) => {
 
 const storeReview = async (review) => {
     try {
-      const filter = { _id: review._id };
+      const filter = { _id: review._id || undefined};
       const replacement = {
         _id: review._id,
         productId: review.productId,
         productTitle: review.productTitle,
         customerId: review.customerId,
         customerName: review.customerName,
+        customerEmail: review.customerEmail,
         rating: review.rating,
         message: review.message,
-        ratingStatus: review.ratingStatus,
+        ratingStatus: review.ratingStatus || 'pending',
       };
 
       const options = { upsert: true, new: true };
@@ -72,7 +104,7 @@ const getReviewsByProductId = async (productId) => {
 
 const getReviewsByCustomerIdAndProductId = async (customerId,productId) => {
   try {
-    const review = await Review.find({ customerId, productId, ratingStatus: 'pending' });
+    const review = await Review.find({ customerId, productId });
     return review;
   } catch (error) {
     console.error('Error fetching reviews:', error);
@@ -94,4 +126,4 @@ const deleteReviewById = async (reviewId) => {
 };
 
 
-export {loadReview, storeReview, getReviewsByProductId, deleteReviewById, getReviewsByCustomerIdAndProductId};
+export {loadReview, storeReview, getReviewsByProductId, deleteReviewById, getReviewsByCustomerIdAndProductId, getAllReviews, approveReviewById};

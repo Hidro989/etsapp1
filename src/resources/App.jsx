@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Login } from './Login.jsx';
 import Products from './Products.jsx';
+import Reviews from './Reviews.jsx';
 import { AppProvider } from "@shopify/polaris";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -13,7 +14,8 @@ const Main = () => {
     const shop = urlParams.get('shop');
 
     if (urlParams.get('embedded')) {
-        return <Products/>;
+        // return <Products/>;
+        return <Reviews/>;
     }
     
     if (shop && isValidShop(shop)) {
