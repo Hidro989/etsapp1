@@ -56,4 +56,22 @@ export class SessionShopifyApp {
       });
     }
   };
+
+  static loadSessionByShop = async (shopDomain) => {
+    const dbSession = await Session.findOne({ shop: shopDomain });
+    if (dbSession) {
+      return new SessionShopify({
+        id: dbSession.session_id,
+        shop: dbSession.shop,
+        state: dbSession.state,
+        scope: dbSession.scope,
+        accessToken: dbSession.access_token,
+        expires: dbSession.expires_at,
+        isOnline: dbSession.is_online,
+        onlineAccessInfo: dbSession.online_access_info,
+      });
+    }
+    return null;
+  };
+
 }

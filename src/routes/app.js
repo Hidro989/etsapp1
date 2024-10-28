@@ -18,6 +18,7 @@ import Review, {
   getAllReviews,
   approveReviewById,
 } from "../app/models/Review.js";
+import { SessionShopifyApp } from "../app/lib/SessionShopifyApp.js";
 
 const app = express();
 
@@ -346,7 +347,33 @@ app.get("/getDataRating", async (req, res) => {
   }
 });
 
+async function getPaidOrderWithValidation(variables, shop) {
+  let {orderId, productId, customerId} = variables;
+  
+  let session = await SessionShopifyApp.loadSessionByShop(shop);
+
+  const orderResponse = await shopify.rest.Order.find({
+    session: session,
+    id: orderId,
+    fields: "id,line_items,name,customer",
+  });
+  
+  if (orderResponse.customer.id == customerId) {
+    let filtered = orderResponse.line_items.filter( item => item.product_id == productId);
+    return filtered.length > 0;
+  }else {
+    return false;
+  }
+
+}
+
+function getShopDomain(url) {
+  const match = url.match(/https?:\/\/(.*?\.myshopify\.com)/);
+  return match ? match[1] : null;
+}
+
 app.post("/saveRating", async (req, res) => {
+
   let formData = Object.assign({}, getFormField);
   for (const key in formData) {
     if (Object.prototype.hasOwnProperty.call(formData, key)) {
@@ -355,9 +382,15 @@ app.post("/saveRating", async (req, res) => {
     }
   }
   const errors = ETSValidate.validateFields(formData);
+
+  let shop = getShopDomain(req.headers.referer);
+  let check = await getPaidOrderWithValidation({orderId: req.body.ets_order_id, productId: req.body.ets_product_id, customerId: req.body.ets_customer_id}, shop);
+  if (!check) {
+    res.status(200).json({ status: "error", error: {} });
+  }
   
   if (Object.keys(errors).length > 0) {
-    res.status(200).json({ status: "error", error: errors });
+    res.status(200).json({ status: "error", message: '' });
   } else {
     if (
       await storeReview(
